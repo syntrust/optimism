@@ -1028,9 +1028,7 @@ func TestEcotone(t *testing.T) {
 func TestSoulGasToken(t *testing.T) {
 	t.Run("no SoulGasToken", func(t *testing.T) {
 		InitParallel(t)
-		cfg := DefaultSystemConfig(t)
-		cfg.EnableSoulGasToken = true
-		cfg.IsSoulBackedByNative = true
+		cfg := DefaultSystemConfigForSoulGasToken(t, true, true)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
@@ -1063,9 +1061,7 @@ func TestSoulGasToken(t *testing.T) {
 	})
 	t.Run("have SoulGasToken but not enough", func(t *testing.T) {
 		InitParallel(t)
-		cfg := DefaultSystemConfig(t)
-		cfg.EnableSoulGasToken = true
-		cfg.IsSoulBackedByNative = true
+		cfg := DefaultSystemConfigForSoulGasToken(t, true, true)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
@@ -1118,9 +1114,7 @@ func TestSoulGasToken(t *testing.T) {
 	})
 	t.Run("have SoulGasToken and enough", func(t *testing.T) {
 		InitParallel(t)
-		cfg := DefaultSystemConfig(t)
-		cfg.EnableSoulGasToken = true
-		cfg.IsSoulBackedByNative = true
+		cfg := DefaultSystemConfigForSoulGasToken(t, true, true)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()

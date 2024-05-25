@@ -256,16 +256,12 @@ contract L2Genesis is Deployer {
         address impl = _setImplementationCode(Predeploys.SOUL_GAS_TOKEN);
 
         if (Constants.IS_SOUL_BACKED_BY_NATIVE) {
-            SoulGasToken(payable(impl)).initialize({
-                name_: "SoulGasToken",
-                symbol_: "SoulGasToken",
-                owner_: Constants.DEPOSITOR_ACCOUNT
-            });
+            SoulGasToken(payable(impl)).initialize({ name_: "SoulGasToken", symbol_: "SoulGasToken", owner_: address(0) });
 
             SoulGasToken(payable(Predeploys.SOUL_GAS_TOKEN)).initialize({
                 name_: "SoulGasToken",
                 symbol_: "SoulGasToken",
-                owner_: Constants.DEPOSITOR_ACCOUNT
+                owner_: address(0)
             });
         } else {
             SoulGasToken(payable(impl)).initialize({

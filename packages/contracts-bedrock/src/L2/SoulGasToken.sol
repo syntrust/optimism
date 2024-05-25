@@ -38,24 +38,18 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
     /// @custom:legacy
     /// @notice initialize is used to initialize SoulGasToken contract.
     function initialize(string calldata name_, string calldata symbol_, address owner_) external initializer {
+        __Ownable_init();
         if (Constants.IS_SOUL_BACKED_BY_NATIVE) {
-            // when Constants.IS_SOUL_BACKED_BY_NATIVE, we want owner_ to be a dead account, we choose DEPOSITOR_ACCOUNT
-            // since transferOwnership doesn't accept zero address
-            require(
-                owner_ == Constants.DEPOSITOR_ACCOUNT,
-                "owner_ should be DEPOSITOR_ACCOUNT when Constants.IS_SOUL_BACKED_BY_NATIVE"
-            );
+            require(owner_ == address(0), "owner_ should be zero when Constants.IS_SOUL_BACKED_BY_NATIVE");
+            renounceOwnership();
         } else {
             require(
                 owner_ != Constants.DEPOSITOR_ACCOUNT && owner_ != address(0),
                 "owner_ should not be neither DEPOSITOR_ACCOUNT nor zero when !Constants.IS_SOUL_BACKED_BY_NATIVE"
             );
+            transferOwnership(owner_);
         }
 
-        // even though owner is only used when Constants.IS_SOUL_BACKED_BY_NATIVE, we always initialize the inherited
-        // OwnableUpgradeable
-        __Ownable_init();
-        transferOwnership(owner_);
         // initialize the inherited ERC20Upgradeable
         __ERC20_init(name_, symbol_);
     }

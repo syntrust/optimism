@@ -84,6 +84,13 @@ func newTxMgrConfig(l1Addr string, privKey *ecdsa.PrivateKey) txmgr.CLIConfig {
 	}
 }
 
+func DefaultSystemConfigForSoulGasToken(t *testing.T, enable, isBackedByNative bool) SystemConfig {
+	config := DefaultSystemConfig(t)
+	config.EnableSoulGasToken = enable
+	config.IsSoulBackedByNative = isBackedByNative
+	return config
+}
+
 func DefaultSystemConfig(t *testing.T) SystemConfig {
 	config.ExternalL2TestParms.SkipIfNecessary(t)
 
