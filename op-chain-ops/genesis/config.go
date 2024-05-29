@@ -268,6 +268,12 @@ type DeployConfig struct {
 
 	// When Cancun activates. Relative to L1 genesis.
 	L1CancunTimeOffset *hexutil.Uint64 `json:"l1CancunTimeOffset,omitempty"`
+
+	// UseSoulGasToken is a flag that indicates if the system is using SoulGasToken
+	UseSoulGasToken bool `json:"useSoulGasToken"`
+	// IsSoulBackedByNative is a flag that indicates if the SoulGasToken is backed by native.
+	// Only effective when UseSoulGasToken is true.
+	IsSoulBackedByNative bool `json:"isSoulBackedByNative"`
 }
 
 // Copy will deeply copy the DeployConfig. This does a JSON roundtrip to copy

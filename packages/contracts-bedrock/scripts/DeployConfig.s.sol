@@ -77,6 +77,9 @@ contract DeployConfig is Script {
     bool public useCustomGasToken;
     address public customGasTokenAddress;
 
+    bool public useSoulGasToken;
+    bool public isSoulBackedByNative;
+
     function read(string memory _path) public {
         console.log("DeployConfig: reading file %s", _path);
         try vm.readFile(_path) returns (string memory data) {
@@ -151,6 +154,9 @@ contract DeployConfig is Script {
 
         useCustomGasToken = _readOr(_json, "$.useCustomGasToken", false);
         customGasTokenAddress = _readOr(_json, "$.customGasTokenAddress", address(0));
+
+        useSoulGasToken = _readOr(_json, "$.useSoulGasToken", false);
+        isSoulBackedByNative = _readOr(_json, "$.isoulBackedByNative", false);
     }
 
     function l1StartingBlockTag() public returns (bytes32) {

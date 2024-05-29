@@ -37,9 +37,6 @@ library Constants {
     ///         transactions.
     address internal constant DEPOSITOR_ACCOUNT = 0xDeaDDEaDDeAdDeAdDEAdDEaddeAddEAdDEAd0001;
 
-    /// @notice This boolean variable represents the mode of SoulGasToken. It should never be changed after deployment.
-    bool internal constant IS_SOUL_BACKED_BY_NATIVE = true;
-
     /// @notice Returns the default values for the ResourceConfig. These are the recommended values
     ///         for a production network.
     function DEFAULT_RESOURCE_CONFIG() internal pure returns (ResourceMetering.ResourceConfig memory) {

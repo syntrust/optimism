@@ -86,7 +86,7 @@ func newTxMgrConfig(l1Addr string, privKey *ecdsa.PrivateKey) txmgr.CLIConfig {
 
 func DefaultSystemConfigForSoulGasToken(t *testing.T, enable, isBackedByNative bool) SystemConfig {
 	config := DefaultSystemConfig(t)
-	config.EnableSoulGasToken = enable
+	config.UseSoulGasToken = enable
 	config.IsSoulBackedByNative = isBackedByNative
 	return config
 }
@@ -238,7 +238,7 @@ type SystemConfig struct {
 	// concurrently. 0 means unlimited.
 	MaxPendingTransactions uint64
 
-	EnableSoulGasToken   bool
+	UseSoulGasToken      bool
 	IsSoulBackedByNative bool
 }
 

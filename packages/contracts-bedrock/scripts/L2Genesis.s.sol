@@ -232,7 +232,7 @@ contract L2Genesis is Deployer {
         // 1B,1C,1D,1E,1F: not used.
         setSchemaRegistry(); // 20
         setEAS(); // 21
-        setSoulGasToken(); // 800
+        if (cfg.useSoulGasToken()) setSoulGasToken(); // 800
         setGovernanceToken(); // 42: OP (not behind a proxy)
     }
 
@@ -252,30 +252,31 @@ contract L2Genesis is Deployer {
         _setImplementationCode(Predeploys.L2_TO_L1_MESSAGE_PASSER);
     }
 
+    /// @notice This predeploy is following the safety invariant #2.
     function setSoulGasToken() public {
-        address impl = _setImplementationCode(Predeploys.SOUL_GAS_TOKEN);
-
-        if (Constants.IS_SOUL_BACKED_BY_NATIVE) {
-            SoulGasToken(payable(impl)).initialize({ name_: "SoulGasToken", symbol_: "SoulGasToken", owner_: address(0) });
-
-            SoulGasToken(payable(Predeploys.SOUL_GAS_TOKEN)).initialize({
+        address impl = Predeploys.predeployToCodeNamespace(Predeploys.SOUL_GAS_TOKEN);
+        console.log("Setting %s implementation at: %s", "SoulGasToken", impl);
+        SoulGasToken token;
+        if (cfg.isSoulBackedByNative()) {
+            token = new SoulGasToken({
                 name_: "SoulGasToken",
                 symbol_: "SoulGasToken",
-                owner_: address(0)
+                owner_: address(0),
+                isBackedByNative_: true
             });
         } else {
-            SoulGasToken(payable(impl)).initialize({
+            token = new SoulGasToken({
                 name_: "SoulGasToken",
                 symbol_: "SoulGasToken",
-                owner_: cfg.proxyAdminOwner()
-            });
-
-            SoulGasToken(payable(Predeploys.SOUL_GAS_TOKEN)).initialize({
-                name_: "SoulGasToken",
-                symbol_: "SoulGasToken",
-                owner_: cfg.proxyAdminOwner()
+                owner_: cfg.proxyAdminOwner(),
+                isBackedByNative_: false
             });
         }
+        vm.etch(impl, address(token).code);
+
+        /// Reset so its not included state dump
+        vm.etch(address(token), "");
+        vm.resetNonce(address(token));
     }
 
     /// @notice This predeploy is following the safety invariant #1.
