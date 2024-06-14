@@ -258,16 +258,12 @@ contract L2Genesis is Deployer {
         console.log("Setting %s implementation at: %s", "SoulGasToken", impl);
         SoulGasToken token;
         if (cfg.isSoulBackedByNative()) {
-            token = new SoulGasToken({
-                name_: "SoulGasToken",
-                symbol_: "SoulGasToken",
-                owner_: address(0),
-                isBackedByNative_: true
-            });
+            token =
+                new SoulGasToken({ name_: "SoulGasToken", symbol_: "SGT", owner_: address(0), isBackedByNative_: true });
         } else {
             token = new SoulGasToken({
                 name_: "SoulGasToken",
-                symbol_: "SoulGasToken",
+                symbol_: "SGT",
                 owner_: cfg.proxyAdminOwner(),
                 isBackedByNative_: false
             });
