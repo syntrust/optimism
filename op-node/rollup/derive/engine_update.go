@@ -158,7 +158,7 @@ func confirmPayload(
 			return nil, BlockInsertPayloadErr, fmt.Errorf("got blobs when updateSafe")
 		}
 		if dacClient != nil {
-			err = dacClient.UploadBlobs(envelope)
+			err = dacClient.UploadBlobs(ctx, envelope)
 			if err != nil {
 				return nil, BlockInsertTemporaryErr, fmt.Errorf("UploadBlobs failed: %w", err)
 			}

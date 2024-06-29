@@ -260,8 +260,8 @@ type DeployConfig struct {
 	L1CancunTimeOffset *hexutil.Uint64 `json:"l1CancunTimeOffset,omitempty"`
 
 	// l2 blob related configs
-	EnableL2Blob bool   `json:"enable_l2_blob,omitempty"`
-	DACURL       string `json:"dac_url,omitempty"`
+	EnableL2Blob bool     `json:"enable_l2_blob,omitempty"`
+	DACURLS      []string `json:"dac_urls,omitempty"`
 }
 
 // Copy will deeply copy the DeployConfig. This does a JSON roundtrip to copy
@@ -568,8 +568,8 @@ func (d *DeployConfig) RollupConfig(l1StartBlock *types.Block, l2GenesisBlockHas
 		l2BlobConfig = &rollup.L2BlobConfig{
 			EnableL2Blob: true,
 		}
-		if d.DACURL != "" {
-			l2BlobConfig.DACConfig = &rollup.DACConfig{URL: d.DACURL}
+		if len(d.DACURLS) > 0 {
+			l2BlobConfig.DACConfig = &rollup.DACConfig{URLS: d.DACURLS}
 		}
 	}
 	return &rollup.Config{

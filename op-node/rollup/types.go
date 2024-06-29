@@ -132,16 +132,16 @@ type L2BlobConfig struct {
 	EnableL2Blob bool       `json:"enable_l2_blob,omitempty"`
 }
 type DACConfig struct {
-	URL string
+	URLS []string
 }
 
 type DACClient interface {
-	UploadBlobs(*eth.ExecutionPayloadEnvelope) error
+	UploadBlobs(context.Context, *eth.ExecutionPayloadEnvelope) error
 }
 
 func (dacConfig *DACConfig) Client() DACClient {
 
-	return client.New(dacConfig.URL, common.Address{} /* this will be specified in the PR for phase 2 da */)
+	return client.New(dacConfig.URLS)
 }
 
 func (cfg *Config) IsL2BlobEnabled() bool {

@@ -13,7 +13,7 @@ require (
 	github.com/ethereum-optimism/go-ethereum-hdwallet v0.1.3
 	github.com/ethereum-optimism/superchain-registry/superchain v0.0.0-20240318114348-52d3dbd1605d
 	github.com/ethereum/go-ethereum v1.13.8
-	github.com/ethstorage/da-server v0.0.0-20240429131756-431639da87c3
+	github.com/ethstorage/da-server v0.0.0-20240628094857-ed2ee4ff52d9
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-chi/docgen v1.2.0
@@ -197,7 +197,6 @@ require (
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect
-	github.com/urfave/cli v1.22.14 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.uber.org/automaxprocs v1.5.2 // indirect
