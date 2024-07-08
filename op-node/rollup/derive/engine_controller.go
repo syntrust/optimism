@@ -74,6 +74,8 @@ type EngineController struct {
 	buildingInfo eth.PayloadInfo
 	buildingSafe bool
 	safeAttrs    *AttributesWithParent
+
+	dacClient rollup.DACClient
 }
 
 func NewEngineController(engine ExecEngine, log log.Logger, metrics Metrics, rollupCfg *rollup.Config, syncMode sync.Mode) *EngineController {
@@ -82,6 +84,10 @@ func NewEngineController(engine ExecEngine, log log.Logger, metrics Metrics, rol
 		syncStatus = syncStatusWillStartEL
 	}
 
+	var dacClient rollup.DACClient
+	if dacConfig := rollupCfg.DACConfig(); dacConfig != nil {
+		dacClient = dacConfig.Client()
+	}
 	return &EngineController{
 		engine:     engine,
 		log:        log,
@@ -91,6 +97,7 @@ func NewEngineController(engine ExecEngine, log log.Logger, metrics Metrics, rol
 		syncMode:   syncMode,
 		syncStatus: syncStatus,
 		clock:      clock.SystemClock,
+		dacClient:  dacClient,
 	}
 }
 
@@ -212,7 +219,7 @@ func (e *EngineController) ConfirmPayload(ctx context.Context, agossip async.Asy
 	}
 	// Update the safe head if the payload is built with the last attributes in the batch.
 	updateSafe := e.buildingSafe && e.safeAttrs != nil && e.safeAttrs.isLastInSpan
-	envelope, errTyp, err := confirmPayload(ctx, e.log, e.engine, fc, e.buildingInfo, updateSafe, agossip, sequencerConductor)
+	envelope, errTyp, err := confirmPayload(ctx, e.log, e.engine, fc, e.buildingInfo, updateSafe, agossip, sequencerConductor, e.dacClient)
 	if err != nil {
 		return nil, errTyp, fmt.Errorf("failed to complete building on top of L2 chain %s, id: %s, error (%d): %w", e.buildingOnto, e.buildingInfo.ID, errTyp, err)
 	}

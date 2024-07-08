@@ -90,6 +90,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/elastic/gosigar v0.14.2 // indirect
 	github.com/ethereum/c-kzg-4844 v0.4.0 // indirect
+	github.com/ethstorage/da-server v0.0.0-20240628094857-ed2ee4ff52d9 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/ferranbt/fastssz v0.1.2 // indirect
@@ -205,6 +206,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect
+	github.com/urfave/cli v1.22.14 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.uber.org/automaxprocs v1.5.2 // indirect

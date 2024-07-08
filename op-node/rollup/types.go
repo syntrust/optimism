@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethstorage/da-server/pkg/da/client"
 
 	plasma "github.com/ethereum-optimism/optimism/op-plasma"
 	"github.com/ethereum-optimism/optimism/op-service/eth"
@@ -140,6 +141,36 @@ type Config struct {
 
 	// LegacyUsePlasma is activated when the chain is in plasma mode.
 	LegacyUsePlasma bool `json:"use_plasma,omitempty"`
+
+	L2BlobConfig *L2BlobConfig `json:"l2_blob_config,omitempty"`
+}
+
+type L2BlobConfig struct {
+	DACConfig    *DACConfig `json:"dac_config,omitempty"`
+	EnableL2Blob bool       `json:"enable_l2_blob,omitempty"`
+}
+type DACConfig struct {
+	URLS []string
+}
+
+type DACClient interface {
+	UploadBlobs(context.Context, *eth.ExecutionPayloadEnvelope) error
+}
+
+func (dacConfig *DACConfig) Client() DACClient {
+
+	return client.New(dacConfig.URLS)
+}
+
+func (cfg *Config) IsL2BlobEnabled() bool {
+	return cfg.L2BlobConfig != nil && cfg.L2BlobConfig.EnableL2Blob
+}
+
+func (cfg *Config) DACConfig() *DACConfig {
+	if cfg.L2BlobConfig == nil {
+		return nil
+	}
+	return cfg.L2BlobConfig.DACConfig
 }
 
 // ValidateL1Config checks L1 config variables for errors.

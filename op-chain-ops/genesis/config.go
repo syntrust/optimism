@@ -289,6 +289,9 @@ type DeployConfig struct {
 
 	// UseInterop is a flag that indicates if the system is using interop
 	UseInterop bool `json:"useInterop,omitempty"`
+	// l2 blob related configs
+	EnableL2Blob bool     `json:"enable_l2_blob,omitempty"`
+	DACURLS      []string `json:"dac_urls,omitempty"`
 }
 
 // Copy will deeply copy the DeployConfig. This does a JSON roundtrip to copy
@@ -618,6 +621,15 @@ func (d *DeployConfig) RollupConfig(l1StartBlock *types.Block, l2GenesisBlockHas
 		}
 	}
 
+	var l2BlobConfig *rollup.L2BlobConfig
+	if d.EnableL2Blob {
+		l2BlobConfig = &rollup.L2BlobConfig{
+			EnableL2Blob: true,
+		}
+		if len(d.DACURLS) > 0 {
+			l2BlobConfig.DACConfig = &rollup.DACConfig{URLS: d.DACURLS}
+		}
+	}
 	return &rollup.Config{
 		Genesis: rollup.Genesis{
 			L1: eth.BlockID{
@@ -652,6 +664,7 @@ func (d *DeployConfig) RollupConfig(l1StartBlock *types.Block, l2GenesisBlockHas
 		FjordTime:              d.FjordTime(l1StartBlock.Time()),
 		InteropTime:            d.InteropTime(l1StartBlock.Time()),
 		PlasmaConfig:           plasma,
+		L2BlobConfig:           l2BlobConfig,
 	}, nil
 }
 
