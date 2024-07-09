@@ -84,6 +84,13 @@ func newTxMgrConfig(l1Addr string, privKey *ecdsa.PrivateKey) txmgr.CLIConfig {
 	}
 }
 
+func DefaultSystemConfigForSoulGasToken(t *testing.T, enable, isBackedByNative bool) SystemConfig {
+	config := DefaultSystemConfig(t)
+	config.UseSoulGasToken = enable
+	config.IsSoulBackedByNative = isBackedByNative
+	return config
+}
+
 func DefaultSystemConfig(t testing.TB) SystemConfig {
 	config.ExternalL2TestParms.SkipIfNecessary(t)
 
@@ -230,6 +237,9 @@ type SystemConfig struct {
 	// MaxPendingTransactions determines how many transactions the batcher will try to send
 	// concurrently. 0 means unlimited.
 	MaxPendingTransactions uint64
+
+	UseSoulGasToken      bool
+	IsSoulBackedByNative bool
 }
 
 type GethInstance struct {

@@ -10,6 +10,7 @@ import { Artifacts } from "scripts/Artifacts.s.sol";
 import { DeployConfig } from "scripts/DeployConfig.s.sol";
 import { Predeploys } from "src/libraries/Predeploys.sol";
 import { Preinstalls } from "src/libraries/Preinstalls.sol";
+import { Constants } from "src/libraries/Constants.sol";
 import { L2CrossDomainMessenger } from "src/L2/L2CrossDomainMessenger.sol";
 import { L1Block } from "src/L2/L1Block.sol";
 import { GasPriceOracle } from "src/L2/GasPriceOracle.sol";
@@ -20,6 +21,7 @@ import { OptimismMintableERC20Factory } from "src/universal/OptimismMintableERC2
 import { OptimismMintableERC721Factory } from "src/universal/OptimismMintableERC721Factory.sol";
 import { BaseFeeVault } from "src/L2/BaseFeeVault.sol";
 import { L1FeeVault } from "src/L2/L1FeeVault.sol";
+import { SoulGasToken } from "src/L2/SoulGasToken.sol";
 import { GovernanceToken } from "src/governance/GovernanceToken.sol";
 import { L1CrossDomainMessenger } from "src/L1/L1CrossDomainMessenger.sol";
 import { L1StandardBridge } from "src/L1/L1StandardBridge.sol";
@@ -242,6 +244,7 @@ contract L2Genesis is Deployer {
         // 1B,1C,1D,1E,1F: not used.
         setSchemaRegistry(); // 20
         setEAS(); // 21
+        if (cfg.useSoulGasToken()) setSoulGasToken(); // 800
         setGovernanceToken(); // 42: OP (not behind a proxy)
         if (cfg.useInterop()) {
             setCrossL2Inbox(); // 22
@@ -263,6 +266,33 @@ contract L2Genesis is Deployer {
 
     function setL2ToL1MessagePasser() public {
         _setImplementationCode(Predeploys.L2_TO_L1_MESSAGE_PASSER);
+    }
+
+    /// @notice This predeploy is following the safety invariant #2.
+    function setSoulGasToken() public {
+        address impl = Predeploys.predeployToCodeNamespace(Predeploys.SOUL_GAS_TOKEN);
+        console.log("Setting %s implementation at: %s", "SoulGasToken", impl);
+        SoulGasToken token;
+        if (cfg.isSoulBackedByNative()) {
+            token = new SoulGasToken({
+                name_: "WorldSuperComputer",
+                symbol_: "WSC",
+                owner_: address(0),
+                isBackedByNative_: true
+            });
+        } else {
+            token = new SoulGasToken({
+                name_: "WorldSuperComputer",
+                symbol_: "WSC",
+                owner_: cfg.proxyAdminOwner(),
+                isBackedByNative_: false
+            });
+        }
+        vm.etch(impl, address(token).code);
+
+        /// Reset so its not included state dump
+        vm.etch(address(token), "");
+        vm.resetNonce(address(token));
     }
 
     /// @notice This predeploy is following the safety invariant #1.

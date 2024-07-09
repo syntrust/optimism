@@ -68,6 +68,10 @@ func NewOpGeth(t testing.TB, ctx context.Context, cfg *SystemConfig) (*OpGeth, e
 	l2Allocs := config.L2Allocs(allocsMode)
 	l2Genesis, err := genesis.BuildL2Genesis(cfg.DeployConfig, l2Allocs, l1Block)
 	require.Nil(t, err)
+	if cfg.UseSoulGasToken {
+		l2Genesis.Config.Optimism.UseSoulGasToken = true
+		l2Genesis.Config.Optimism.IsSoulBackedByNative = cfg.IsSoulBackedByNative
+	}
 	l2GenesisBlock := l2Genesis.ToBlock()
 
 	rollupGenesis := rollup.Genesis{
@@ -90,6 +94,9 @@ func NewOpGeth(t testing.TB, ctx context.Context, cfg *SystemConfig) (*OpGeth, e
 		require.Nil(t, gethNode.Start())
 		node = gethNode
 	} else {
+		if cfg.UseSoulGasToken {
+			return nil, fmt.Errorf("SoulGasToken not supported for ExternalL2")
+		}
 		externalNode := (&ExternalRunner{
 			Name:    "l2",
 			BinPath: cfg.ExternalL2Shim,

@@ -292,6 +292,12 @@ type DeployConfig struct {
 	// l2 blob related configs
 	EnableL2Blob bool     `json:"enable_l2_blob,omitempty"`
 	DACURLS      []string `json:"dac_urls,omitempty"`
+
+	// UseSoulGasToken is a flag that indicates if the system is using SoulGasToken
+	UseSoulGasToken bool `json:"useSoulGasToken"`
+	// IsSoulBackedByNative is a flag that indicates if the SoulGasToken is backed by native.
+	// Only effective when UseSoulGasToken is true.
+	IsSoulBackedByNative bool `json:"isSoulBackedByNative"`
 }
 
 // Copy will deeply copy the DeployConfig. This does a JSON roundtrip to copy

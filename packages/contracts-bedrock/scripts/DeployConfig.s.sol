@@ -78,6 +78,8 @@ contract DeployConfig is Script {
     address public customGasTokenAddress;
 
     bool public useInterop;
+    bool public useSoulGasToken;
+    bool public isSoulBackedByNative;
 
     function read(string memory _path) public {
         console.log("DeployConfig: reading file %s", _path);
@@ -156,6 +158,8 @@ contract DeployConfig is Script {
         customGasTokenAddress = _readOr(_json, "$.customGasTokenAddress", address(0));
 
         useInterop = _readOr(_json, "$.useInterop", false);
+        useSoulGasToken = _readOr(_json, "$.useSoulGasToken", false);
+        isSoulBackedByNative = _readOr(_json, "$.isoulBackedByNative", false);
     }
 
     function l1StartingBlockTag() public returns (bytes32) {

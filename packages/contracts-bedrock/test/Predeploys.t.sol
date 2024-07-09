@@ -21,7 +21,8 @@ contract PredeploysTest is CommonTest {
             || _addr == Predeploys.GAS_PRICE_ORACLE || _addr == Predeploys.DEPLOYER_WHITELIST || _addr == Predeploys.WETH
             || _addr == Predeploys.L1_BLOCK_NUMBER || _addr == Predeploys.LEGACY_MESSAGE_PASSER
             || _addr == Predeploys.PROXY_ADMIN || _addr == Predeploys.BASE_FEE_VAULT || _addr == Predeploys.L1_FEE_VAULT
-            || _addr == Predeploys.GOVERNANCE_TOKEN || _addr == Predeploys.SCHEMA_REGISTRY || _addr == Predeploys.EAS;
+            || _addr == Predeploys.GOVERNANCE_TOKEN || _addr == Predeploys.SCHEMA_REGISTRY || _addr == Predeploys.EAS
+            || _addr == Predeploys.SOUL_GAS_TOKEN;
     }
 
     /// @dev Returns true if the address is not proxied.
@@ -42,7 +43,7 @@ contract PredeploysTest is CommonTest {
                 || _addr == Predeploys.L1_BLOCK_NUMBER || _addr == Predeploys.L1_BLOCK_ATTRIBUTES
                 || _addr == Predeploys.L2_TO_L1_MESSAGE_PASSER || _addr == Predeploys.OPTIMISM_MINTABLE_ERC721_FACTORY
                 || _addr == Predeploys.PROXY_ADMIN || _addr == Predeploys.SCHEMA_REGISTRY || _addr == Predeploys.EAS
-                || _addr == Predeploys.GOVERNANCE_TOKEN
+                || _addr == Predeploys.GOVERNANCE_TOKEN || _addr == Predeploys.SOUL_GAS_TOKEN
         );
     }
 
