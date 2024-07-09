@@ -67,5 +67,7 @@
   "daChallengeWindow": 160,
   "daResolveWindow": 160,
   "daBondSize": 1000000,
+  "useSoulGasToken": true,
+  "isSoulBackedByNative": true,
   "daResolverRefundPercentage": 0
 }

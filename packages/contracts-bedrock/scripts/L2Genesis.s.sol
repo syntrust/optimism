@@ -255,28 +255,39 @@ contract L2Genesis is Deployer {
     /// @notice This predeploy is following the safety invariant #2.
     function setSoulGasToken() public {
         address impl = Predeploys.predeployToCodeNamespace(Predeploys.SOUL_GAS_TOKEN);
-        console.log("Setting %s implementation at: %s", "SoulGasToken", impl);
+        console.log(
+            "Setting %s implementation at: %s, isSoulBackedByNative:%d",
+            "SoulGasToken",
+            impl,
+            cfg.isSoulBackedByNative()
+        );
         SoulGasToken token;
         if (cfg.isSoulBackedByNative()) {
-            token = new SoulGasToken({
-                name_: "WorldSuperComputer",
-                symbol_: "WSC",
-                owner_: address(0),
-                isBackedByNative_: true
-            });
+            token = new SoulGasToken({ isBackedByNative_: true });
         } else {
-            token = new SoulGasToken({
-                name_: "WorldSuperComputer",
-                symbol_: "WSC",
-                owner_: cfg.proxyAdminOwner(),
-                isBackedByNative_: false
-            });
+            token = new SoulGasToken({ isBackedByNative_: false });
         }
         vm.etch(impl, address(token).code);
 
         /// Reset so its not included state dump
         vm.etch(address(token), "");
         vm.resetNonce(address(token));
+
+        if (cfg.isSoulBackedByNative()) {
+            SoulGasToken(impl).initialize({ name_: "", symbol_: "", owner_: address(0) });
+            SoulGasToken(Predeploys.SOUL_GAS_TOKEN).initialize({
+                name_: "WorldSuperComputer",
+                symbol_: "WSC",
+                owner_: address(0)
+            });
+        } else {
+            SoulGasToken(impl).initialize({ name_: "", symbol_: "", owner_: cfg.proxyAdminOwner() });
+            SoulGasToken(Predeploys.SOUL_GAS_TOKEN).initialize({
+                name_: "WorldSuperComputer",
+                symbol_: "WSC",
+                owner_: cfg.proxyAdminOwner()
+            });
+        }
     }
 
     /// @notice This predeploy is following the safety invariant #1.

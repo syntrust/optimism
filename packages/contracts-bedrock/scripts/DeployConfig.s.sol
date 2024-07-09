@@ -156,7 +156,7 @@ contract DeployConfig is Script {
         customGasTokenAddress = _readOr(_json, "$.customGasTokenAddress", address(0));
 
         useSoulGasToken = _readOr(_json, "$.useSoulGasToken", false);
-        isSoulBackedByNative = _readOr(_json, "$.isoulBackedByNative", false);
+        isSoulBackedByNative = _readOr(_json, "$.isSoulBackedByNative", false);
     }
 
     function l1StartingBlockTag() public returns (bytes32) {
