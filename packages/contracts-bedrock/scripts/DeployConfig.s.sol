@@ -159,7 +159,7 @@ contract DeployConfig is Script {
 
         useInterop = _readOr(_json, "$.useInterop", false);
         useSoulGasToken = _readOr(_json, "$.useSoulGasToken", false);
-        isSoulBackedByNative = _readOr(_json, "$.isoulBackedByNative", false);
+        isSoulBackedByNative = _readOr(_json, "$.isSoulBackedByNative", false);
     }
 
     function l1StartingBlockTag() public returns (bytes32) {

@@ -33,9 +33,12 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         }
     }
 
-    constructor(string memory name_, string memory symbol_, address owner_, bool isBackedByNative_) {
+    constructor(bool isBackedByNative_) {
         IS_BACKED_BY_NATIVE = isBackedByNative_;
+    }
 
+    /// @notice Initializer.
+    function initialize(string memory name_, string memory symbol_, address owner_) public initializer {
         __Ownable_init();
         if (IS_BACKED_BY_NATIVE) {
             require(owner_ == address(0), "owner_ should be zero when IS_BACKED_BY_NATIVE");
