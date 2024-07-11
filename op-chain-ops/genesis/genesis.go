@@ -72,6 +72,7 @@ func NewL2Genesis(config *DeployConfig, block *types.Block) (*core.Genesis, erro
 			EIP1559Denominator:       eip1559Denom,
 			EIP1559Elasticity:        eip1559Elasticity,
 			EIP1559DenominatorCanyon: eip1559DenomCanyon,
+			EnableL2Blob:             config.EnableL2Blob,
 			IsSoulBackedByNative:     config.IsSoulBackedByNative,
 			UseSoulGasToken:          config.UseSoulGasToken,
 		},
