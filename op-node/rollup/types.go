@@ -150,7 +150,7 @@ type L2BlobConfig struct {
 	EnableL2Blob bool       `json:"enable_l2_blob,omitempty"`
 }
 type DACConfig struct {
-	URLS []string
+	URLS []string `json:"urls,omitempty"`
 }
 
 type DACClient interface {
