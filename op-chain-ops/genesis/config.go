@@ -298,6 +298,9 @@ type DeployConfig struct {
 	// IsSoulBackedByNative is a flag that indicates if the SoulGasToken is backed by native.
 	// Only effective when UseSoulGasToken is true.
 	IsSoulBackedByNative bool `json:"isSoulBackedByNative"`
+
+	// UseInboxContract is a flag that indicates if the inbox is a contract
+	UseInboxContract bool `json:"use_inbox_contract"`
 }
 
 // Copy will deeply copy the DeployConfig. This does a JSON roundtrip to copy
