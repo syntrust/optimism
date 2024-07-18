@@ -73,6 +73,8 @@ func (ds *BlobDataSource) Next(ctx context.Context) (eth.Data, error) {
 	return data, nil
 }
 
+// getTxSucceedIfUseInboxContract returns nil if !useInboxContract;
+// otherwise it returns a non-nil map which contains all successful tx hashes
 func getTxSucceedIfUseInboxContract(ctx context.Context, useInboxContract bool, fetcher L1Fetcher, hash common.Hash) (txSucceeded map[common.Hash]bool, err error) {
 	if !useInboxContract {
 		return
@@ -84,7 +86,9 @@ func getTxSucceedIfUseInboxContract(ctx context.Context, useInboxContract bool, 
 
 	txSucceeded = make(map[common.Hash]bool)
 	for _, receipt := range receipts {
-		txSucceeded[receipt.TxHash] = receipt.Status == types.ReceiptStatusSuccessful
+		if receipt.Status == types.ReceiptStatusSuccessful {
+			txSucceeded[receipt.TxHash] = true
+		}
 	}
 	return
 }
