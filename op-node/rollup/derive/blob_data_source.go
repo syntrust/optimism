@@ -73,6 +73,26 @@ func (ds *BlobDataSource) Next(ctx context.Context) (eth.Data, error) {
 	return data, nil
 }
 
+// getTxSucceedIfUseInboxContract returns nil if !useInboxContract;
+// otherwise it returns a non-nil map which contains all successful tx hashes
+func getTxSucceedIfUseInboxContract(ctx context.Context, useInboxContract bool, fetcher L1Fetcher, hash common.Hash) (txSucceeded map[common.Hash]bool, err error) {
+	if !useInboxContract {
+		return
+	}
+	_, receipts, err := fetcher.FetchReceipts(ctx, hash)
+	if err != nil {
+		return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
+	}
+
+	txSucceeded = make(map[common.Hash]bool)
+	for _, receipt := range receipts {
+		if receipt.Status == types.ReceiptStatusSuccessful {
+			txSucceeded[receipt.TxHash] = true
+		}
+	}
+	return
+}
+
 // open fetches and returns the blob or calldata (as appropriate) from all valid batcher
 // transactions in the referenced block. Returns an empty (non-nil) array if no batcher
 // transactions are found. It returns ResetError if it cannot find the referenced block or a
@@ -85,14 +105,9 @@ func (ds *BlobDataSource) open(ctx context.Context) ([]blobOrCalldata, error) {
 		}
 		return nil, NewTemporaryError(fmt.Errorf("failed to open blob data source: %w", err))
 	}
-	_, receipts, err := ds.fetcher.FetchReceipts(ctx, ds.ref.Hash)
+	txSucceeded, err := getTxSucceedIfUseInboxContract(ctx, ds.dsCfg.useInboxContract, ds.fetcher, ds.ref.Hash)
 	if err != nil {
-		return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
-	}
-
-	txSucceeded := make(map[common.Hash]bool)
-	for _, receipt := range receipts {
-		txSucceeded[receipt.TxHash] = receipt.Status == types.ReceiptStatusSuccessful
+		return nil, err
 	}
 
 	data, hashes := dataAndHashesFromTxs(txs, &ds.dsCfg, ds.batcherAddr, txSucceeded)
@@ -129,8 +144,9 @@ func dataAndHashesFromTxs(txs types.Transactions, config *DataSourceConfig, batc
 	var hashes []eth.IndexedBlobHash
 	blobIndex := 0 // index of each blob in the block's blob sidecar
 	for _, tx := range txs {
-		// skip any non-batcher transactions or failed transactions
-		if !(isValidBatchTx(tx, config.l1Signer, config.batchInboxAddress, batcherAddr) && txSucceeded[tx.Hash()]) {
+		// skip any non-batcher transactions or failed transactions if useInboxContract
+		// note: txSucceeded will only be nil when !useInboxContract
+		if !(isValidBatchTx(tx, config.l1Signer, config.batchInboxAddress, batcherAddr) && (txSucceeded == nil || txSucceeded[tx.Hash()])) {
 			blobIndex += len(tx.BlobHashes())
 			continue
 		}
