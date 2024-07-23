@@ -291,16 +291,12 @@ contract L2Genesis is Deployer {
 
         if (cfg.isSoulBackedByNative()) {
             SoulGasToken(impl).initialize({ name_: "", symbol_: "", owner_: address(0) });
-            SoulGasToken(Predeploys.SOUL_GAS_TOKEN).initialize({
-                name_: "WorldSuperComputer",
-                symbol_: "WSC",
-                owner_: address(0)
-            });
+            SoulGasToken(Predeploys.SOUL_GAS_TOKEN).initialize({ name_: "QKC", symbol_: "QKC", owner_: address(0) });
         } else {
             SoulGasToken(impl).initialize({ name_: "", symbol_: "", owner_: cfg.proxyAdminOwner() });
             SoulGasToken(Predeploys.SOUL_GAS_TOKEN).initialize({
-                name_: "WorldSuperComputer",
-                symbol_: "WSC",
+                name_: "QKC",
+                symbol_: "QKC",
                 owner_: cfg.proxyAdminOwner()
             });
         }
