@@ -516,21 +516,18 @@ func (l *BatchSubmitter) sendTransaction(ctx context.Context, txdata txData, que
 	if *candidate.To != l.RollupConfig.BatchInboxAddress {
 		return fmt.Errorf("candidate.To is not inbox")
 	}
-	if l.RollupConfig.UseInboxContract && l.inboxIsEOA == nil {
+	if l.inboxIsEOA == nil {
 		var code []byte
 		code, err = l.L1Client.CodeAt(ctx, *candidate.To, nil)
 		if err != nil {
 			return fmt.Errorf("CodeAt failed:%w", err)
 		}
 		isEOA := len(code) == 0
-		if !isEOA {
-			return fmt.Errorf("UseInboxContract is enabled but BatchInboxAddress is an EOA")
-		}
 		l.inboxIsEOA = &isEOA
 	}
 
-	// Don't set GasLimit when UseInboxContract is enabled so that later on `EstimateGas` will be called
-	if !l.RollupConfig.UseInboxContract {
+	// Don't set GasLimit when inbox is contract so that later on `EstimateGas` will be called
+	if !*l.inboxIsEOA {
 		intrinsicGas, err := core.IntrinsicGas(candidate.TxData, nil, false, true, true, false)
 		if err != nil {
 			// we log instead of return an error here because txmgr can do its own gas estimation
@@ -573,8 +570,8 @@ func (l *BatchSubmitter) handleReceipt(r txmgr.TxReceipt[txID]) {
 	if r.Err != nil {
 		l.recordFailedTx(r.ID, r.Err)
 	} else {
-		// check tx status if UseInboxContract
-		if l.RollupConfig.UseInboxContract && r.Receipt.Status == types.ReceiptStatusFailed {
+		// check tx status
+		if r.Receipt.Status == types.ReceiptStatusFailed {
 			l.recordFailedTx(r.ID, ErrInboxTransactionFailed)
 			return
 		}
