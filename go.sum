@@ -47,8 +47,6 @@ github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/bits-and-blooms/bitset v1.10.0 h1:ePXTeiPEazB5+opbv5fr8umg2R/1NlzgDsyepwsSr88=
 github.com/bits-and-blooms/bitset v1.10.0/go.mod h1:7hO7Gc7Pp1vODcmWvKMRA9BNmbv6a/7QIWpPxHddWR8=
-github.com/blockchaindevsh/op-geth v0.0.0-20240711035602-dfbe1492069c h1:uSibLxYF1JVhapdx6xszr5f/Bzm2RU3l66mag3KdZoY=
-github.com/blockchaindevsh/op-geth v0.0.0-20240711035602-dfbe1492069c/go.mod h1:8tQ6r0e1NNJbSVHzYKafQqf62gV9BzZR+SKkXRckjLM=
 github.com/boltdb/bolt v1.3.1 h1:JQmyP4ZBrce+ZQu0dY660FMfatumYDLun9hBCUVIkF4=
 github.com/boltdb/bolt v1.3.1/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
 github.com/bradfitz/go-smtpd v0.0.0-20170404230938-deb6d6237625/go.mod h1:HYsPBTaaSFSlLx/70C2HPIMNZpVV8+vt/A+FMnYP11g=
@@ -183,6 +181,8 @@ github.com/ethereum/c-kzg-4844 v0.4.0 h1:3MS1s4JtA868KpJxroZoepdV0ZKBp3u/O5HcZ7R
 github.com/ethereum/c-kzg-4844 v0.4.0/go.mod h1:VewdlzQmpT5QSrVhbBuGoCdFJkpaJlO1aQputP83wc0=
 github.com/ethstorage/da-server v0.0.0-20240628094857-ed2ee4ff52d9 h1:yRJRj81rP83R5dZEsYitAFcqRagK/e+UxhiSSK4/Wds=
 github.com/ethstorage/da-server v0.0.0-20240628094857-ed2ee4ff52d9/go.mod h1:YeveZNzQFdseeqS0mQavqfyMI+U9l1GQu0CEwezTZA8=
+github.com/ethstorage/op-geth v0.0.0-20240917122918-64a6306fa986 h1:VOG50dsZCNOBBBg6yoKWn3/eWMtfFLXoOnvT23t68nI=
+github.com/ethstorage/op-geth v0.0.0-20240917122918-64a6306fa986/go.mod h1:8tQ6r0e1NNJbSVHzYKafQqf62gV9BzZR+SKkXRckjLM=
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
 github.com/fatih/color v1.15.0 h1:kOqh6YHBtK8aywxGerMG2Eq3H6Qgoqeo13Bk2Mv/nBs=
 github.com/fatih/color v1.15.0/go.mod h1:0h5ZqXfHYED7Bhv2ZJamyIOUej9KtShiJESRwBDUSsw=

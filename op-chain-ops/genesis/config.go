@@ -290,8 +290,8 @@ type DeployConfig struct {
 	// UseInterop is a flag that indicates if the system is using interop
 	UseInterop bool `json:"useInterop,omitempty"`
 	// l2 blob related configs
-	EnableL2Blob bool     `json:"enable_l2_blob,omitempty"`
-	DACURLS      []string `json:"dac_urls,omitempty"`
+	L2BlobTime *uint64  `json:"l2BlobTime,omitempty"`
+	DACURLS    []string `json:"dac_urls,omitempty"`
 
 	// UseSoulGasToken is a flag that indicates if the system is using SoulGasToken
 	UseSoulGasToken bool `json:"useSoulGasToken"`
@@ -631,9 +631,9 @@ func (d *DeployConfig) RollupConfig(l1StartBlock *types.Block, l2GenesisBlockHas
 	}
 
 	var l2BlobConfig *rollup.L2BlobConfig
-	if d.EnableL2Blob {
+	if d.L2BlobTime != nil {
 		l2BlobConfig = &rollup.L2BlobConfig{
-			EnableL2Blob: true,
+			L2BlobTime: d.L2BlobTime,
 		}
 		if len(d.DACURLS) > 0 {
 			l2BlobConfig.DACConfig = &rollup.DACConfig{URLS: d.DACURLS}

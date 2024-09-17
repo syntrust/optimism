@@ -149,8 +149,8 @@ type Config struct {
 }
 
 type L2BlobConfig struct {
-	DACConfig    *DACConfig `json:"dac_config,omitempty"`
-	EnableL2Blob bool       `json:"enable_l2_blob,omitempty"`
+	DACConfig  *DACConfig `json:"dac_config,omitempty"`
+	L2BlobTime *uint64    `json:"l2BlobTime,omitempty"`
 }
 type DACConfig struct {
 	URLS []string `json:"urls,omitempty"`
@@ -165,8 +165,9 @@ func (dacConfig *DACConfig) Client() DACClient {
 	return client.New(dacConfig.URLS)
 }
 
-func (cfg *Config) IsL2BlobEnabled() bool {
-	return cfg.L2BlobConfig != nil && cfg.L2BlobConfig.EnableL2Blob
+// IsL2Blob returns whether l2 blob is enabled
+func (cfg *Config) IsL2Blob(parentTime uint64) bool {
+	return cfg.L2BlobConfig != nil && *cfg.L2BlobConfig.L2BlobTime <= parentTime
 }
 
 func (cfg *Config) DACConfig() *DACConfig {
