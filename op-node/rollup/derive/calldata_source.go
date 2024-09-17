@@ -44,7 +44,7 @@ func NewCalldataSource(ctx context.Context, log log.Logger, dsCfg DataSourceConf
 			batcherAddr: batcherAddr,
 		}
 	}
-	txSucceed, err := getTxSucceed(ctx, fetcher, ref.Hash)
+	txSucceed, err := getTxSucceed(ctx, fetcher, ref.Hash, dsCfg.batchInboxAddress)
 	if err != nil {
 		return &CalldataSource{
 			open:        false,
@@ -67,7 +67,7 @@ func NewCalldataSource(ctx context.Context, log log.Logger, dsCfg DataSourceConf
 func (ds *CalldataSource) Next(ctx context.Context) (eth.Data, error) {
 	if !ds.open {
 		if _, txs, err := ds.fetcher.InfoAndTxsByHash(ctx, ds.ref.Hash); err == nil {
-			txSucceeded, err := getTxSucceed(ctx, ds.fetcher, ds.ref.Hash)
+			txSucceeded, err := getTxSucceed(ctx, ds.fetcher, ds.ref.Hash, ds.dsCfg.batchInboxAddress)
 			if err != nil {
 				return nil, err
 			}

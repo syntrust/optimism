@@ -73,8 +73,8 @@ func (ds *BlobDataSource) Next(ctx context.Context) (eth.Data, error) {
 	return data, nil
 }
 
-// getTxSucceed returns a non-nil map which contains all successful tx hashes
-func getTxSucceed(ctx context.Context, fetcher L1Fetcher, hash common.Hash) (txSucceeded map[common.Hash]bool, err error) {
+// getTxSucceed returns a non-nil map which contains all successful tx hashes to batch inbox
+func getTxSucceed(ctx context.Context, fetcher L1Fetcher, hash common.Hash, batchInboxAddress common.Address) (txSucceeded map[common.Hash]bool, err error) {
 	_, receipts, err := fetcher.FetchReceipts(ctx, hash)
 	if err != nil {
 		return nil, NewTemporaryError(fmt.Errorf("failed to fetch L1 block info and receipts: %w", err))
@@ -82,7 +82,7 @@ func getTxSucceed(ctx context.Context, fetcher L1Fetcher, hash common.Hash) (txS
 
 	txSucceeded = make(map[common.Hash]bool)
 	for _, receipt := range receipts {
-		if receipt.Status == types.ReceiptStatusSuccessful {
+		if receipt.Status == types.ReceiptStatusSuccessful && receipt.ContractAddress == batchInboxAddress {
 			txSucceeded[receipt.TxHash] = true
 		}
 	}
@@ -101,7 +101,7 @@ func (ds *BlobDataSource) open(ctx context.Context) ([]blobOrCalldata, error) {
 		}
 		return nil, NewTemporaryError(fmt.Errorf("failed to open blob data source: %w", err))
 	}
-	txSucceeded, err := getTxSucceed(ctx, ds.fetcher, ds.ref.Hash)
+	txSucceeded, err := getTxSucceed(ctx, ds.fetcher, ds.ref.Hash, ds.dsCfg.batchInboxAddress)
 	if err != nil {
 		return nil, err
 	}
