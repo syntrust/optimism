@@ -290,8 +290,8 @@ type DeployConfig struct {
 	// UseInterop is a flag that indicates if the system is using interop
 	UseInterop bool `json:"useInterop,omitempty"`
 	// l2 blob related configs
-	L2BlobTime *uint64  `json:"l2BlobTime,omitempty"`
-	DACURLS    []string `json:"dac_urls,omitempty"`
+	L2GenesisBlobTimeOffset *hexutil.Uint64 `json:"l2GenesisBlobTimeOffset,omitempty"`
+	DACURLS                 []string        `json:"dac_urls,omitempty"`
 
 	// UseSoulGasToken is a flag that indicates if the system is using SoulGasToken
 	UseSoulGasToken bool `json:"useSoulGasToken"`
@@ -612,6 +612,17 @@ func (d *DeployConfig) InteropTime(genesisTime uint64) *uint64 {
 	return &v
 }
 
+func (d *DeployConfig) L2BlobTime(genesisTime uint64) *uint64 {
+	if d.L2GenesisBlobTimeOffset == nil {
+		return nil
+	}
+	v := uint64(0)
+	if offset := *d.L2GenesisBlobTimeOffset; offset > 0 {
+		v = genesisTime + uint64(offset)
+	}
+	return &v
+}
+
 // RollupConfig converts a DeployConfig to a rollup.Config. If Ecotone is active at genesis, the
 // Overhead value is considered a noop.
 func (d *DeployConfig) RollupConfig(l1StartBlock *types.Block, l2GenesisBlockHash common.Hash, l2GenesisBlockNumber uint64) (*rollup.Config, error) {
@@ -631,9 +642,9 @@ func (d *DeployConfig) RollupConfig(l1StartBlock *types.Block, l2GenesisBlockHas
 	}
 
 	var l2BlobConfig *rollup.L2BlobConfig
-	if d.L2BlobTime != nil {
+	if d.L2GenesisBlobTimeOffset != nil {
 		l2BlobConfig = &rollup.L2BlobConfig{
-			L2BlobTime: d.L2BlobTime,
+			L2BlobTime: d.L2BlobTime(l1StartBlock.Time()),
 		}
 		if len(d.DACURLS) > 0 {
 			l2BlobConfig.DACConfig = &rollup.DACConfig{URLS: d.DACURLS}
