@@ -11,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethstorage/da-server/pkg/da/client"
 
 	plasma "github.com/ethereum-optimism/optimism/op-plasma"
 	"github.com/ethereum-optimism/optimism/op-service/eth"
@@ -149,20 +148,7 @@ type Config struct {
 }
 
 type L2BlobConfig struct {
-	DACConfig  *DACConfig `json:"dac_config,omitempty"`
-	L2BlobTime *uint64    `json:"l2BlobTime,omitempty"`
-}
-type DACConfig struct {
-	URLS []string `json:"urls,omitempty"`
-}
-
-type DACClient interface {
-	UploadBlobs(context.Context, *eth.ExecutionPayloadEnvelope) error
-}
-
-func (dacConfig *DACConfig) Client() DACClient {
-
-	return client.New(dacConfig.URLS)
+	L2BlobTime *uint64 `json:"l2BlobTime,omitempty"`
 }
 
 // IsL2Blob returns whether l2 blob is enabled
@@ -170,11 +156,9 @@ func (cfg *Config) IsL2Blob(parentTime uint64) bool {
 	return cfg.L2BlobConfig != nil && *cfg.L2BlobConfig.L2BlobTime <= parentTime
 }
 
-func (cfg *Config) DACConfig() *DACConfig {
-	if cfg.L2BlobConfig == nil {
-		return nil
-	}
-	return cfg.L2BlobConfig.DACConfig
+// IsL2BlobTimeSet returns whether l2 blob activation time is set
+func (cfg *Config) IsL2BlobTimeSet() bool {
+	return cfg.L2BlobConfig != nil && cfg.L2BlobConfig.L2BlobTime != nil
 }
 
 // ValidateL1Config checks L1 config variables for errors.

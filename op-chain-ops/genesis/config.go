@@ -292,7 +292,6 @@ type DeployConfig struct {
 	// L2GenesisBlobTimeOffset is the number of seconds after genesis block that the L2Blob hard fork activates.
 	// Set it to 0 to activate at genesis. Nil to disable L2Blob.
 	L2GenesisBlobTimeOffset *hexutil.Uint64 `json:"l2GenesisBlobTimeOffset,omitempty"`
-	DACURLS                 []string        `json:"dac_urls,omitempty"`
 
 	// UseSoulGasToken is a flag that indicates if the system is using SoulGasToken
 	UseSoulGasToken bool `json:"useSoulGasToken"`
@@ -646,9 +645,6 @@ func (d *DeployConfig) RollupConfig(l1StartBlock *types.Block, l2GenesisBlockHas
 	if d.L2GenesisBlobTimeOffset != nil {
 		l2BlobConfig = &rollup.L2BlobConfig{
 			L2BlobTime: d.L2BlobTime(l1StartBlock.Time()),
-		}
-		if len(d.DACURLS) > 0 {
-			l2BlobConfig.DACConfig = &rollup.DACConfig{URLS: d.DACURLS}
 		}
 	}
 	return &rollup.Config{
