@@ -68,11 +68,11 @@ func NewL2Genesis(config *DeployConfig, block *types.Block) (*core.Genesis, erro
 		EcotoneTime:                   config.EcotoneTime(block.Time()),
 		FjordTime:                     config.FjordTime(block.Time()),
 		InteropTime:                   config.InteropTime(block.Time()),
+		L2BlobTime:                    config.L2BlobTime(block.Time()),
 		Optimism: &params.OptimismConfig{
 			EIP1559Denominator:       eip1559Denom,
 			EIP1559Elasticity:        eip1559Elasticity,
 			EIP1559DenominatorCanyon: eip1559DenomCanyon,
-			EnableL2Blob:             config.EnableL2Blob,
 			IsSoulBackedByNative:     config.IsSoulBackedByNative,
 			UseSoulGasToken:          config.UseSoulGasToken,
 		},
