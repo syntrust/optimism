@@ -289,7 +289,8 @@ type DeployConfig struct {
 
 	// UseInterop is a flag that indicates if the system is using interop
 	UseInterop bool `json:"useInterop,omitempty"`
-	// l2 blob related configs
+	// L2GenesisBlobTimeOffset is the number of seconds after genesis block that the L2Blob hard fork activates.
+	// Set it to 0 to activate at genesis. Nil to disable L2Blob.
 	L2GenesisBlobTimeOffset *hexutil.Uint64 `json:"l2GenesisBlobTimeOffset,omitempty"`
 	DACURLS                 []string        `json:"dac_urls,omitempty"`
 
