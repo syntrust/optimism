@@ -5,16 +5,20 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 	"time"
 
 	"github.com/ethereum-optimism/optimism/op-node/flags"
 	"github.com/ethereum-optimism/optimism/op-node/p2p"
 	"github.com/ethereum-optimism/optimism/op-node/rollup"
+	"github.com/ethereum-optimism/optimism/op-node/rollup/derive"
 	"github.com/ethereum-optimism/optimism/op-node/rollup/driver"
 	"github.com/ethereum-optimism/optimism/op-node/rollup/sync"
 	plasma "github.com/ethereum-optimism/optimism/op-plasma"
 	"github.com/ethereum-optimism/optimism/op-service/oppprof"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethstorage/da-server/pkg/da/client"
+	"github.com/urfave/cli/v2"
 )
 
 type Config struct {
@@ -76,6 +80,30 @@ type Config struct {
 
 	// Plasma DA config
 	Plasma plasma.CLIConfig
+
+	// DACConfig for sequencer when l2 blob is enabled
+	DACConfig *DACConfig
+}
+
+func ReadDACConfigFromCLI(c *cli.Context) *DACConfig {
+	urls := c.String(flags.DACUrlsFlag.Name)
+	if urls == "" {
+		return nil
+	}
+	return &DACConfig{
+		URLS: strings.Split(urls, ","),
+	}
+}
+
+type DACConfig struct {
+	URLS []string
+}
+
+func (dacConfig *DACConfig) Client() derive.DACClient {
+	if dacConfig == nil || len(dacConfig.URLS) == 0 {
+		return nil
+	}
+	return client.New(dacConfig.URLS)
 }
 
 type RPCConfig struct {
@@ -173,6 +201,12 @@ func (cfg *Config) Check() error {
 	}
 	if err := cfg.Plasma.Check(); err != nil {
 		return fmt.Errorf("plasma config error: %w", err)
+	}
+	if cfg.Driver.SequencerEnabled && cfg.Rollup.IsL2BlobTimeSet() && cfg.DACConfig == nil {
+		return fmt.Errorf("dac.urls must be set for sequencer when l2 blob time is set")
+	}
+	if (!cfg.Driver.SequencerEnabled || !cfg.Rollup.IsL2BlobTimeSet()) && cfg.DACConfig != nil {
+		return fmt.Errorf("dac.urls can only be set for sequencer when l2 blob time is set")
 	}
 	return nil
 }

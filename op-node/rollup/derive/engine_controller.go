@@ -44,6 +44,10 @@ type ExecEngine interface {
 	L2BlockRefByLabel(ctx context.Context, label eth.BlockLabel) (eth.L2BlockRef, error)
 }
 
+type DACClient interface {
+	UploadBlobs(context.Context, *eth.ExecutionPayloadEnvelope) error
+}
+
 type EngineController struct {
 	engine     ExecEngine // Underlying execution engine RPC
 	log        log.Logger
@@ -75,19 +79,15 @@ type EngineController struct {
 	buildingSafe bool
 	safeAttrs    *AttributesWithParent
 
-	dacClient rollup.DACClient
+	dacClient DACClient
 }
 
-func NewEngineController(engine ExecEngine, log log.Logger, metrics Metrics, rollupCfg *rollup.Config, syncMode sync.Mode) *EngineController {
+func NewEngineController(engine ExecEngine, log log.Logger, metrics Metrics, rollupCfg *rollup.Config, syncMode sync.Mode, dacClient DACClient) *EngineController {
 	syncStatus := syncStatusCL
 	if syncMode == sync.ELSync {
 		syncStatus = syncStatusWillStartEL
 	}
 
-	var dacClient rollup.DACClient
-	if dacConfig := rollupCfg.DACConfig(); dacConfig != nil {
-		dacClient = dacConfig.Client()
-	}
 	return &EngineController{
 		engine:     engine,
 		log:        log,
