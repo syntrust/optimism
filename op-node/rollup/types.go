@@ -142,9 +142,6 @@ type Config struct {
 	LegacyUsePlasma bool `json:"use_plasma,omitempty"`
 
 	L2BlobConfig *L2BlobConfig `json:"l2_blob_config,omitempty"`
-
-	// UseInboxContract is a flag that indicates if the inbox is a contract
-	UseInboxContract bool `json:"use_inbox_contract"`
 }
 
 type L2BlobConfig struct {
