@@ -57,7 +57,7 @@ const (
 	// If the client hits a request error, it counts as a lot of rate-limit tokens for syncing from that peer:
 	// we rather sync from other servers. We'll try again later,
 	// and eventually kick the peer based on degraded scoring if it's really not serving us well.
-	// TODO(CLI-4009): Use a backoff rather than this mechanism.
+	// TODO: Use a backoff rather than this mechanism.
 	clientErrRateCost = peerServerBlocksBurst
 )
 
@@ -67,6 +67,13 @@ const (
 	ResultCodeInvalidErr  byte = 2
 	ResultCodeUnknownErr  byte = 3
 )
+
+var resultCodeString = []string{
+	"success",
+	"not found",
+	"invalid request",
+	"unknown error",
+}
 
 func PayloadByNumberProtocolID(l2ChainID *big.Int) protocol.ID {
 	return protocol.ID(fmt.Sprintf("/opstack/req/payload_by_number/%d/0", l2ChainID))
@@ -303,7 +310,7 @@ func NewSyncClient(log log.Logger, cfg *rollup.Config, host HostNewStream, rcv r
 	}
 
 	// never errors with positive LRU cache size
-	// TODO(CLI-3733): if we had an LRU based on on total payloads size, instead of payload count,
+	// TODO: if we had an LRU based on on total payloads size, instead of payload count,
 	//  we can safely buffer more data in the happy case.
 	q, _ := simplelru.NewLRU[common.Hash, syncResult](100, c.onQuarantineEvict)
 	c.quarantine = q
@@ -630,7 +637,13 @@ func (s *SyncClient) peerLoop(ctx context.Context, id peer.ID) {
 type requestResultErr byte
 
 func (r requestResultErr) Error() string {
-	return fmt.Sprintf("peer failed to serve request with code %d", uint8(r))
+	var errStr string
+	if ri := int(r); ri < len(resultCodeString) {
+		errStr = resultCodeString[ri]
+	} else {
+		errStr = "invalid code"
+	}
+	return fmt.Sprintf("peer failed to serve request with code %d: %s", uint8(r), errStr)
 }
 
 func (r requestResultErr) ResultCode() byte {
@@ -820,7 +833,7 @@ func (srv *ReqRespServer) HandleSyncRequest(ctx context.Context, log log.Logger,
 		log.Warn("failed to serve p2p sync request", "req", req, "err", err)
 		if errors.Is(err, ethereum.NotFound) {
 			resultCode = ResultCodeNotFoundErr
-		} else if errors.Is(err, invalidRequestErr) {
+		} else if errors.Is(err, errInvalidRequest) {
 			resultCode = ResultCodeInvalidErr
 		} else {
 			resultCode = ResultCodeUnknownErr
@@ -833,7 +846,7 @@ func (srv *ReqRespServer) HandleSyncRequest(ctx context.Context, log log.Logger,
 	srv.metrics.ServerPayloadByNumberEvent(req, resultCode, time.Since(start))
 }
 
-var invalidRequestErr = errors.New("invalid request")
+var errInvalidRequest = errors.New("invalid request")
 
 func (srv *ReqRespServer) handleSyncRequest(ctx context.Context, stream network.Stream) (uint64, error) {
 	peerId := stream.Conn().RemotePeer()
@@ -879,14 +892,14 @@ func (srv *ReqRespServer) handleSyncRequest(ctx context.Context, stream network.
 
 	// Check the request is within the expected range of blocks
 	if req < srv.cfg.Genesis.L2.Number {
-		return req, fmt.Errorf("cannot serve request for L2 block %d before genesis %d: %w", req, srv.cfg.Genesis.L2.Number, invalidRequestErr)
+		return req, fmt.Errorf("cannot serve request for L2 block %d before genesis %d: %w", req, srv.cfg.Genesis.L2.Number, errInvalidRequest)
 	}
 	max, err := srv.cfg.TargetBlockNumber(uint64(time.Now().Unix()))
 	if err != nil {
-		return req, fmt.Errorf("cannot determine max target block number to verify request: %w", invalidRequestErr)
+		return req, fmt.Errorf("cannot determine max target block number to verify request: %w", errInvalidRequest)
 	}
 	if req > max {
-		return req, fmt.Errorf("cannot serve request for L2 block %d after max expected block (%v): %w", req, max, invalidRequestErr)
+		return req, fmt.Errorf("cannot serve request for L2 block %d after max expected block (%v): %w", req, max, errInvalidRequest)
 	}
 
 	envelope, err := srv.l2.PayloadByNumber(ctx, req)

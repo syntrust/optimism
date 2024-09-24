@@ -35,6 +35,7 @@ type rpcConfig struct {
 	backoffAttempts  int
 	limit            float64
 	burst            int
+	lazy             bool
 }
 
 type RPCOption func(cfg *rpcConfig) error
@@ -74,6 +75,17 @@ func WithRateLimit(rateLimit float64, burst int) RPCOption {
 	}
 }
 
+// WithLazyDial makes the RPC client initialization defer the initial connection attempt,
+// and defer to later RPC requests upon subsequent dial errors.
+// Any dial-backoff option will be ignored if this option is used.
+// This is implemented by wrapping the inner RPC client with a LazyRPC.
+func WithLazyDial() RPCOption {
+	return func(cfg *rpcConfig) error {
+		cfg.lazy = true
+		return nil
+	}
+}
+
 // NewRPC returns the correct client.RPC instance for a given RPC url.
 func NewRPC(ctx context.Context, lgr log.Logger, addr string, opts ...RPCOption) (RPC, error) {
 	var cfg rpcConfig
@@ -87,12 +99,16 @@ func NewRPC(ctx context.Context, lgr log.Logger, addr string, opts ...RPCOption)
 		cfg.backoffAttempts = 1
 	}
 
-	underlying, err := dialRPCClientWithBackoff(ctx, lgr, addr, cfg.backoffAttempts, cfg.gethRPCOptions...)
-	if err != nil {
-		return nil, err
+	var wrapped RPC
+	if cfg.lazy {
+		wrapped = NewLazyRPC(addr, cfg.gethRPCOptions...)
+	} else {
+		underlying, err := dialRPCClientWithBackoff(ctx, lgr, addr, cfg.backoffAttempts, cfg.gethRPCOptions...)
+		if err != nil {
+			return nil, err
+		}
+		wrapped = &BaseRPCClient{c: underlying}
 	}
-
-	var wrapped RPC = &BaseRPCClient{c: underlying}
 
 	if cfg.limit != 0 {
 		wrapped = NewRateLimitingClient(wrapped, rate.Limit(cfg.limit), cfg.burst)
@@ -113,7 +129,7 @@ func NewRPCWithClient(ctx context.Context, lgr log.Logger, addr string, underlyi
 func dialRPCClientWithBackoff(ctx context.Context, log log.Logger, addr string, attempts int, opts ...rpc.ClientOption) (*rpc.Client, error) {
 	bOff := retry.Exponential()
 	return retry.Do(ctx, attempts, bOff, func() (*rpc.Client, error) {
-		if !IsURLAvailable(addr) {
+		if !IsURLAvailable(ctx, addr) {
 			log.Warn("failed to dial address, but may connect later", "addr", addr)
 			return nil, fmt.Errorf("address unavailable (%s)", addr)
 		}
@@ -125,7 +141,7 @@ func dialRPCClientWithBackoff(ctx context.Context, log log.Logger, addr string, 
 	})
 }
 
-func IsURLAvailable(address string) bool {
+func IsURLAvailable(ctx context.Context, address string) bool {
 	u, err := url.Parse(address)
 	if err != nil {
 		return false
@@ -142,7 +158,8 @@ func IsURLAvailable(address string) bool {
 			return true
 		}
 	}
-	conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
+	dialer := net.Dialer{Timeout: 5 * time.Second}
+	conn, err := dialer.DialContext(ctx, "tcp", addr)
 	if err != nil {
 		return false
 	}

@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ethereum-optimism/optimism/cannon/mipsevm"
-	"github.com/ethereum-optimism/optimism/op-service/jsonutil"
+	factory "github.com/ethereum-optimism/optimism/cannon/mipsevm/versions"
 	"github.com/urfave/cli/v2"
 )
 
@@ -26,15 +25,11 @@ var (
 func Witness(ctx *cli.Context) error {
 	input := ctx.Path(WitnessInputFlag.Name)
 	output := ctx.Path(WitnessOutputFlag.Name)
-	state, err := jsonutil.LoadJSON[mipsevm.State](input)
+	state, err := factory.LoadStateFromFile(input)
 	if err != nil {
 		return fmt.Errorf("invalid input state (%v): %w", input, err)
 	}
-	witness := state.EncodeWitness()
-	h, err := witness.StateHash()
-	if err != nil {
-		return fmt.Errorf("failed to compute witness hash: %w", err)
-	}
+	witness, h := state.EncodeWitness()
 	if output != "" {
 		if err := os.WriteFile(output, witness, 0755); err != nil {
 			return fmt.Errorf("writing output to %v: %w", output, err)

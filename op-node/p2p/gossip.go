@@ -103,8 +103,11 @@ func BuildMsgIdFn(cfg *rollup.Config) pubsub.MsgIdFunction {
 		if err == nil && dLen <= maxGossipSize {
 			res := msgBufPool.Get().(*[]byte)
 			defer msgBufPool.Put(res)
-			if data, err = snappy.Decode((*res)[:0], pmsg.Data); err == nil {
-				*res = data // if we ended up growing the slice capacity, fine, keep the larger one.
+			if data, err = snappy.Decode((*res)[:cap(*res)], pmsg.Data); err == nil {
+				if cap(data) > cap(*res) {
+					// if we ended up growing the slice capacity, fine, keep the larger one.
+					*res = data[:cap(data)]
+				}
 				valid = true
 			}
 		}
@@ -274,12 +277,15 @@ func BuildBlocksValidator(log log.Logger, cfg *rollup.Config, runCfg GossipRunti
 
 		res := msgBufPool.Get().(*[]byte)
 		defer msgBufPool.Put(res)
-		data, err := snappy.Decode((*res)[:0], message.Data)
+		data, err := snappy.Decode((*res)[:cap(*res)], message.Data)
 		if err != nil {
 			log.Warn("invalid snappy compression", "err", err, "peer", id)
 			return pubsub.ValidationReject
 		}
-		*res = data // if we ended up growing the slice capacity, fine, keep the larger one.
+		// if we ended up growing the slice capacity, fine, keep the larger one.
+		if cap(data) > cap(*res) {
+			*res = data[:cap(data)]
+		}
 
 		// message starts with compact-encoding secp256k1 encoded signature
 		signatureBytes, payloadBytes := data[:65], data[65:]
@@ -336,13 +342,13 @@ func BuildBlocksValidator(log log.Logger, cfg *rollup.Config, runCfg GossipRunti
 			return pubsub.ValidationReject
 		}
 
-		// [REJECT] if a V2 Block does not have withdrawals
+		// [REJECT] if a >= V2 Block does not have withdrawals
 		if blockVersion.HasWithdrawals() && payload.Withdrawals == nil {
 			log.Warn("payload is on v2/v3 topic, but does not have withdrawals", "bad_hash", payload.BlockHash.String())
 			return pubsub.ValidationReject
 		}
 
-		// [REJECT] if a V2 Block has non-empty withdrawals
+		// [REJECT] if a >= V2 Block has non-empty withdrawals
 		if blockVersion.HasWithdrawals() && len(*payload.Withdrawals) != 0 {
 			log.Warn("payload is on v2/v3 topic, but has non-empty withdrawals", "bad_hash", payload.BlockHash.String(), "withdrawal_count", len(*payload.Withdrawals))
 			return pubsub.ValidationReject
