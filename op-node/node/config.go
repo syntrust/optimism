@@ -12,8 +12,8 @@ import (
 	"github.com/ethereum-optimism/optimism/op-node/flags"
 	"github.com/ethereum-optimism/optimism/op-node/p2p"
 	"github.com/ethereum-optimism/optimism/op-node/rollup"
-	"github.com/ethereum-optimism/optimism/op-node/rollup/derive"
 	"github.com/ethereum-optimism/optimism/op-node/rollup/driver"
+	"github.com/ethereum-optimism/optimism/op-node/rollup/engine"
 	"github.com/ethereum-optimism/optimism/op-node/rollup/sync"
 	"github.com/ethereum-optimism/optimism/op-service/oppprof"
 	"github.com/ethereum/go-ethereum/log"
@@ -97,7 +97,7 @@ type DACConfig struct {
 	URLS []string
 }
 
-func (dacConfig *DACConfig) Client() derive.DACClient {
+func (dacConfig *DACConfig) Client() engine.DACClient {
 	if dacConfig == nil || len(dacConfig.URLS) == 0 {
 		return nil
 	}

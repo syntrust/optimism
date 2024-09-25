@@ -579,6 +579,7 @@ type L2InitializationConfig struct {
 	UpgradeScheduleDeployConfig
 	L2CoreDeployConfig
 	AltDADeployConfig
+	SoulGasTokenConfig
 }
 
 func (d *L2InitializationConfig) Check(log log.Logger) error {
@@ -847,9 +848,6 @@ type DeployConfig struct {
 
 	// Legacy, ignored, here for strict-JSON decoding to be accepted.
 	LegacyDeployConfig `evm:"-"`
-
-	// SoulGasToken L2 configs
-	SoulGasTokenConfig
 }
 
 // Copy will deeply copy the DeployConfig. This does a JSON roundtrip to copy

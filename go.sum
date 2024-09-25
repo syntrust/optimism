@@ -189,8 +189,8 @@ github.com/ethereum/c-kzg-4844 v1.0.0 h1:0X1LBXxaEtYD9xsyj9B9ctQEZIpnvVDeoBx8aHE
 github.com/ethereum/c-kzg-4844 v1.0.0/go.mod h1:VewdlzQmpT5QSrVhbBuGoCdFJkpaJlO1aQputP83wc0=
 github.com/ethereum/go-verkle v0.1.1-0.20240306133620-7d920df305f0 h1:KrE8I4reeVvf7C1tm8elRjj4BdscTYzz/WAbYyf/JI4=
 github.com/ethereum/go-verkle v0.1.1-0.20240306133620-7d920df305f0/go.mod h1:D9AJLVXSyZQXJQVk8oh1EwjISE+sJTn2duYIZC0dy3w=
-github.com/ethstorage/da-server v0.0.0-20240628094857-ed2ee4ff52d9 h1:yRJRj81rP83R5dZEsYitAFcqRagK/e+UxhiSSK4/Wds=
-github.com/ethstorage/da-server v0.0.0-20240628094857-ed2ee4ff52d9/go.mod h1:YeveZNzQFdseeqS0mQavqfyMI+U9l1GQu0CEwezTZA8=
+github.com/ethstorage/da-server v0.0.0-20240925084712-169d238000e5 h1:pxtnGOGOChxCETGUg2yEIC3nfB5C7ZWzblm4/JE7108=
+github.com/ethstorage/da-server v0.0.0-20240925084712-169d238000e5/go.mod h1:QfuYw2wCpbpW7k+Fwq4s9EMWNu40XDc1KKJICPaNUgQ=
 github.com/ethstorage/op-geth v0.0.0-20240921172637-07437abe4163 h1:3vRJrtL1o1iFHeSyBsClcMzLdSEzliXzwqcwu2xTRfk=
 github.com/ethstorage/op-geth v0.0.0-20240921172637-07437abe4163/go.mod h1:Mk8AhvlqFbjI9oW2ymThSSoqc6kiEH0/tCmHGMEu6ac=
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
