@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -72,7 +73,8 @@ func run(configPath string) error {
 	fmt.Printf("==================    op-geth shim awaiting termination  ==========================\n")
 
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(sigs)
+	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case <-sigs:
@@ -110,6 +112,7 @@ func initialize(binPath string, config external.Config) error {
 	cmd := exec.Command(
 		binPath,
 		"--datadir", config.DataDir,
+		"--state.scheme=hash",
 		"init", config.GenesisPath,
 	)
 	return cmd.Run()
@@ -145,6 +148,7 @@ func execute(binPath string, config external.Config) (*gethSession, error) {
 		"--ws.port", "0",
 		"--ws.api", "debug,eth,txpool,net,engine",
 		"--syncmode=full",
+		"--state.scheme=hash",
 		"--nodiscover",
 		"--port", "0",
 		"--maxpeers", "0",
@@ -176,7 +180,9 @@ func execute(binPath string, config external.Config) (*gethSession, error) {
 		}
 		var authString string
 		var port int
-		fmt.Fscanf(sess.Err, "%d %s", &port, &authString)
+		if _, err := fmt.Fscanf(sess.Err, "%d %s", &port, &authString); err != nil && !errors.Is(err, io.EOF) {
+			return nil, fmt.Errorf("error while reading auth string: %w", err)
+		}
 		switch authString {
 		case "auth=true":
 			enginePort = port
