@@ -72,10 +72,10 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
     }
 
     /// @custom:legacy
-    /// @notice withdraw is called by the burner to burn SoulGasToken and return the native token when
+    /// @notice withdrawFrom is called by the burner to burn SoulGasToken and return the native token when
     /// IS_BACKED_BY_NATIVE.
-    function withdraw(address account, uint256 value) external {
-        require(IS_BACKED_BY_NATIVE, "withdraw should only be called when IS_BACKED_BY_NATIVE");
+    function withdrawFrom(address account, uint256 value) external {
+        require(IS_BACKED_BY_NATIVE, "withdrawFrom should only be called when IS_BACKED_BY_NATIVE");
 
         SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
         require($._burners[_msgSender()], "not the burner");
@@ -85,11 +85,11 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
     }
 
     /// @custom:legacy
-    /// @notice batchWithdraw is the batch version of withdraw.
-    function batchWithdraw(address[] calldata accounts, uint256[] calldata values) external {
+    /// @notice batchWithdrawFrom is the batch version of withdrawFrom.
+    function batchWithdrawFrom(address[] calldata accounts, uint256[] calldata values) external {
         require(accounts.length == values.length, "invalid arguments");
 
-        require(IS_BACKED_BY_NATIVE, "batchWithdraw should only be called when IS_BACKED_BY_NATIVE");
+        require(IS_BACKED_BY_NATIVE, "batchWithdrawFrom should only be called when IS_BACKED_BY_NATIVE");
 
         SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
         require($._burners[_msgSender()], "not the burner");
