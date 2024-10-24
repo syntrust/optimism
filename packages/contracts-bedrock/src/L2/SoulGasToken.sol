@@ -46,7 +46,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         __ERC20_init(name_, symbol_);
     }
 
-    /// @custom:legacy
     /// @notice deposit can be called by anyone to deposit native token for SoulGasToken when
     /// IS_BACKED_BY_NATIVE.
     function deposit() external payable {
@@ -55,7 +54,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         _mint(_msgSender(), msg.value);
     }
 
-    /// @custom:legacy
     /// @notice batchDepositFor can be called by anyone to deposit native token for SoulGasToken in batch when
     /// IS_BACKED_BY_NATIVE.
     function batchDepositFor(address[] calldata accounts, uint256[] calldata values) external payable {
@@ -71,7 +69,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         require(msg.value == totalValue, "unexpected msg.value");
     }
 
-    /// @custom:legacy
     /// @notice withdrawFrom is called by the burner to burn SoulGasToken and return the native token when
     /// IS_BACKED_BY_NATIVE.
     function withdrawFrom(address account, uint256 value) external {
@@ -84,7 +81,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         payable(_msgSender()).transfer(value);
     }
 
-    /// @custom:legacy
     /// @notice batchWithdrawFrom is the batch version of withdrawFrom.
     function batchWithdrawFrom(address[] calldata accounts, uint256[] calldata values) external {
         require(accounts.length == values.length, "invalid arguments");
@@ -103,7 +99,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         payable(_msgSender()).transfer(totalValue);
     }
 
-    /// @custom:legacy
     /// @notice batchMint is called:
     ///                        1. by EOA minters to mint SoulGasToken in batch when !IS_BACKED_BY_NATIVE.
     ///                        2. by DEPOSITOR_ACCOUNT to refund SoulGasToken
@@ -118,7 +113,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         }
     }
 
-    /// @custom:legacy
     /// @notice addMinters is called by the owner to add minters when !IS_BACKED_BY_NATIVE.
     function addMinters(address[] calldata minters_) external onlyOwner {
         require(!IS_BACKED_BY_NATIVE, "addMinters should only be called when !IS_BACKED_BY_NATIVE");
@@ -129,7 +123,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         }
     }
 
-    /// @custom:legacy
     /// @notice delMinters is called by the owner to delete minters when !IS_BACKED_BY_NATIVE.
     function delMinters(address[] calldata minters_) external onlyOwner {
         require(!IS_BACKED_BY_NATIVE, "delMinters should only be called when !IS_BACKED_BY_NATIVE");
@@ -140,7 +133,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         }
     }
 
-    /// @custom:legacy
     /// @notice addBurners is called by the owner to add burners.
     function addBurners(address[] calldata burners_) external onlyOwner {
         SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
@@ -150,7 +142,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         }
     }
 
-    /// @custom:legacy
     /// @notice delBurners is called by the owner to delete burners.
     function delBurners(address[] calldata burners_) external onlyOwner {
         SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
@@ -160,7 +151,6 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         }
     }
 
-    /// @custom:legacy
     /// @notice burnFrom is called when !IS_BACKED_BY_NATIVE:
     ///                             1. by the burner to burn SoulGasToken.
     ///                             2. by DEPOSITOR_ACCOUNT to burn SoulGasToken.
@@ -171,19 +161,28 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         _burn(account, value);
     }
 
-    /// @custom:legacy
+    /// @notice batchBurnFrom is the batch version of burnFrom.
+    function batchBurnFrom(address[] calldata accounts, uint256[] calldata values) external {
+        require(accounts.length == values.length, "invalid arguments");
+        require(!IS_BACKED_BY_NATIVE, "batchBurnFrom should only be called when !IS_BACKED_BY_NATIVE");
+        SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
+        require(_msgSender() == Constants.DEPOSITOR_ACCOUNT || $._burners[_msgSender()], "not the burner");
+
+        for (uint256 i = 0; i < accounts.length; i++) {
+            _burn(accounts[i], values[i]);
+        }
+    }
+
     /// @notice transferFrom is disabled for SoulGasToken.
     function transfer(address, uint256) public virtual override returns (bool) {
         revert("transfer is disabled for SoulGasToken");
     }
 
-    /// @custom:legacy
     /// @notice transferFrom is disabled for SoulGasToken.
     function transferFrom(address, address, uint256) public virtual override returns (bool) {
         revert("transferFrom is disabled for SoulGasToken");
     }
 
-    /// @custom:legacy
     /// @notice approve is disabled for SoulGasToken.
     function approve(address, uint256) public virtual override returns (bool) {
         revert("approve is disabled for SoulGasToken");
