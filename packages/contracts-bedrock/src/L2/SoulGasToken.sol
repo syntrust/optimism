@@ -56,12 +56,12 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
     }
 
     /// @custom:legacy
-    /// @notice batchDeposit can be called by anyone to deposit native token for SoulGasToken in batch when
+    /// @notice batchDepositFor can be called by anyone to deposit native token for SoulGasToken in batch when
     /// IS_BACKED_BY_NATIVE.
-    function batchDeposit(address[] calldata accounts, uint256[] calldata values) external payable {
+    function batchDepositFor(address[] calldata accounts, uint256[] calldata values) external payable {
         require(accounts.length == values.length, "invalid arguments");
 
-        require(IS_BACKED_BY_NATIVE, "batchDeposit should only be called when IS_BACKED_BY_NATIVE");
+        require(IS_BACKED_BY_NATIVE, "batchDepositFor should only be called when IS_BACKED_BY_NATIVE");
 
         uint256 totalValue = 0;
         for (uint256 i = 0; i < accounts.length; i++) {
