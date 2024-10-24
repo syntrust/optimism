@@ -25,7 +25,7 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
     bytes32 private constant _SOULGASTOKEN_STORAGE_LOCATION =
         0x135c38e215d95c59dcdd8fe622dccc30d04cacb8c88c332e4e7441bac172dd00;
 
-    bool public immutable IS_BACKED_BY_NATIVE;
+    bool internal immutable IS_BACKED_BY_NATIVE;
 
     function _getSoulGasTokenStorage() private pure returns (SoulGasTokenStorage storage $) {
         assembly {
@@ -186,5 +186,10 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
     /// @notice approve is disabled for SoulGasToken.
     function approve(address, uint256) public virtual override returns (bool) {
         revert("approve is disabled for SoulGasToken");
+    }
+
+    /// @notice Returns whether SoulGasToken is backed by native token.
+    function isBackedByNative() external view returns (bool) {
+        return IS_BACKED_BY_NATIVE;
     }
 }
