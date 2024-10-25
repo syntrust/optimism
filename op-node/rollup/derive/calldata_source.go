@@ -44,7 +44,7 @@ func NewCalldataSource(ctx context.Context, log log.Logger, dsCfg DataSourceConf
 			batcherAddr: batcherAddr,
 		}
 	}
-	txSucceed, err := getTxSucceed(ctx, fetcher, ref.Hash, dsCfg.batchInboxAddress)
+	txs, err = getTxSucceed(ctx, fetcher, ref.Hash, txs)
 	if err != nil {
 		return &CalldataSource{
 			open:        false,
@@ -57,7 +57,7 @@ func NewCalldataSource(ctx context.Context, log log.Logger, dsCfg DataSourceConf
 	}
 	return &CalldataSource{
 		open: true,
-		data: DataFromEVMTransactions(dsCfg, batcherAddr, txs, log.New("origin", ref), txSucceed),
+		data: DataFromEVMTransactions(dsCfg, batcherAddr, txs, log.New("origin", ref)),
 	}
 }
 
@@ -67,12 +67,12 @@ func NewCalldataSource(ctx context.Context, log log.Logger, dsCfg DataSourceConf
 func (ds *CalldataSource) Next(ctx context.Context) (eth.Data, error) {
 	if !ds.open {
 		if _, txs, err := ds.fetcher.InfoAndTxsByHash(ctx, ds.ref.Hash); err == nil {
-			txSucceeded, err := getTxSucceed(ctx, ds.fetcher, ds.ref.Hash, ds.dsCfg.batchInboxAddress)
+			txs, err := getTxSucceed(ctx, ds.fetcher, ds.ref.Hash, txs)
 			if err != nil {
 				return nil, err
 			}
 			ds.open = true
-			ds.data = DataFromEVMTransactions(ds.dsCfg, ds.batcherAddr, txs, ds.log, txSucceeded)
+			ds.data = DataFromEVMTransactions(ds.dsCfg, ds.batcherAddr, txs, ds.log)
 		} else if errors.Is(err, ethereum.NotFound) {
 			return nil, NewResetError(fmt.Errorf("failed to open calldata source: %w", err))
 		} else {
@@ -91,10 +91,10 @@ func (ds *CalldataSource) Next(ctx context.Context) (eth.Data, error) {
 // DataFromEVMTransactions filters all of the transactions and returns the calldata from transactions
 // that are sent to the batch inbox address from the batch sender address.
 // This will return an empty array if no valid transactions are found.
-func DataFromEVMTransactions(dsCfg DataSourceConfig, batcherAddr common.Address, txs types.Transactions, log log.Logger, txSucceeded map[common.Hash]bool) []eth.Data {
+func DataFromEVMTransactions(dsCfg DataSourceConfig, batcherAddr common.Address, txs types.Transactions, log log.Logger) []eth.Data {
 	out := []eth.Data{}
 	for _, tx := range txs {
-		if isValidBatchTx(tx, dsCfg.l1Signer, dsCfg.batchInboxAddress, batcherAddr, log) && txSucceeded[tx.Hash()] {
+		if isValidBatchTx(tx, dsCfg.l1Signer, dsCfg.batchInboxAddress, batcherAddr, log) {
 			out = append(out, tx.Data())
 		}
 	}
