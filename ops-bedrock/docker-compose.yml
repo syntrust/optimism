@@ -129,6 +129,7 @@ services:
       --altda.enabled=${ALTDA_ENABLED}
       --altda.da-service=${ALTDA_SERVICE}
       --altda.da-server=http://da-server:3100
+      --dac.urls=
     ports:
       - "7545:8545"
       - "9003:9003"
