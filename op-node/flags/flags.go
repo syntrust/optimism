@@ -425,6 +425,7 @@ var optionalFlags = []cli.Flag{
 	ConductorRpcTimeoutFlag,
 	SafeDBPath,
 	L2EngineKind,
+	DACUrlsFlag,
 }
 
 var DeprecatedFlags = []cli.Flag{
