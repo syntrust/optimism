@@ -90,7 +90,7 @@ contract L1Block is ISemver, IGasToken {
     /// @notice size of historyHashes.
     uint256 public constant HISTORY_SIZE = 8192;
     /// @notice The 8191 history L1 blockhashes and 1 latest L1 blockhash.
-    bytes32[HISTORY_SIZE] public historyHashes;
+    bytes32[HISTORY_SIZE] internal historyHashes;
 
     /// @custom:legacy
     /// @notice Updates the L1 block values.
