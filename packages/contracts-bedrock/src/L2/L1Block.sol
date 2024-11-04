@@ -88,9 +88,9 @@ contract L1Block is ISemver, IGasToken {
     }
 
     /// @notice size of historyHashes.
-    uint256 public constant HISTORY_SIZE = 8192;
+    uint256 internal constant HISTORY_SIZE = 8192;
     /// @notice The 8191 history L1 blockhashes and 1 latest L1 blockhash.
-    bytes32[HISTORY_SIZE] public historyHashes;
+    bytes32[HISTORY_SIZE] internal historyHashes;
 
     /// @custom:legacy
     /// @notice Updates the L1 block values.
@@ -206,5 +206,10 @@ contract L1Block is ISemver, IGasToken {
         GasPayingToken.set({ _token: _token, _decimals: _decimals, _name: _name, _symbol: _symbol });
 
         emit GasPayingTokenSet({ token: _token, decimals: _decimals, name: _name, symbol: _symbol });
+    }
+
+    /// @notice Returns the size of history hashes.
+    function historySize() external view returns (uint256) {
+        return HISTORY_SIZE;
     }
 }
