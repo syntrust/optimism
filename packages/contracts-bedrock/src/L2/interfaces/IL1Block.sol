@@ -39,6 +39,6 @@ interface IL1Block {
 
     function __constructor__() external;
 
-    function HISTORY_SIZE() external view returns (uint256);
+    function historySize() external view returns (uint256);
     function blockHash(uint256 _historyNumber) external view returns (bytes32);
 }
