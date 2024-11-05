@@ -58,6 +58,6 @@ interface IL1BlockInterop {
 
     function __constructor__() external;
 
-    function historySize() external view returns (uint256);
+    function historySize() external pure returns (uint256);
     function blockHash(uint256 _historyNumber) external view returns (bytes32);
 }

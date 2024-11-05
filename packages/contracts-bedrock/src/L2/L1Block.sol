@@ -209,7 +209,7 @@ contract L1Block is ISemver, IGasToken {
     }
 
     /// @notice Returns the size of history hashes.
-    function historySize() external view returns (uint256) {
+    function historySize() external pure returns (uint256) {
         return HISTORY_SIZE;
     }
 }
