@@ -15,10 +15,13 @@ import { Constants } from "src/libraries/Constants.sol";
 contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
     /// @custom:storage-location erc7201:openzeppelin.storage.SoulGasToken
     struct SoulGasTokenStorage {
-        // _minters are be whitelist EOAs, only used when !IS_BACKED_BY_NATIVE
+        // _minters are whitelist EOAs, only used when !IS_BACKED_BY_NATIVE
         mapping(address => bool) _minters;
         // _burners are whitelist EOAs to burn/withdraw SoulGasToken
         mapping(address => bool) _burners;
+        // _allow_sgt_value are whitelist contracts to consume sgt as msg.value
+        // when IS_BACKED_BY_NATIVE
+        mapping(address => bool) _allow_sgt_value;
     }
 
     // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.SoulGasToken")) - 1)) & ~bytes32(uint256(0xff))
@@ -148,6 +151,26 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         uint256 i;
         for (i = 0; i < burners_.length; i++) {
             delete $._burners[burners_[i]];
+        }
+    }
+
+    /// @notice allowSgtValue is called by the owner to enable whitelist contracts to consume sgt as msg.value
+    function allowSgtValue(address[] calldata contracts) external onlyOwner {
+        require(IS_BACKED_BY_NATIVE, "allowSgtValue should only be called when IS_BACKED_BY_NATIVE");
+        SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
+        uint256 i;
+        for (i = 0; i < contracts.length; i++) {
+            $._allow_sgt_value[contracts[i]] = true;
+        }
+    }
+
+    /// @notice allowSgtValue is called by the owner to disable whitelist contracts to consume sgt as msg.value
+    function disallowSgtValue(address[] calldata contracts) external onlyOwner {
+        require(IS_BACKED_BY_NATIVE, "disallowSgtValue should only be called when IS_BACKED_BY_NATIVE");
+        SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
+        uint256 i;
+        for (i = 0; i < contracts.length; i++) {
+            $._allow_sgt_value[contracts[i]] = false;
         }
     }
 
