@@ -19,10 +19,17 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         mapping(address => bool) _minters;
         // _burners are whitelist EOAs to burn/withdraw SoulGasToken
         mapping(address => bool) _burners;
-        // _allow_sgt_value are whitelist contracts to consume sgt as msg.value
+        // _allowSgtValue are whitelist contracts to consume sgt as msg.value
         // when IS_BACKED_BY_NATIVE
-        mapping(address => bool) _allow_sgt_value;
+        mapping(address => bool) _allowSgtValue;
     }
+
+    /// @notice Emitted when sgt as msg.value is enabled for a contract.
+    /// @param from     Address of the contract for which sgt as msg.value is enabled.
+    event AllowSgtValue(address indexed from);
+    /// @notice Emitted when sgt as msg.value is disabled for a contract.
+    /// @param from     Address of the contract for which sgt as msg.value is disabled.
+    event DisallowSgtValue(address indexed from);
 
     // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.SoulGasToken")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant _SOULGASTOKEN_STORAGE_LOCATION =
@@ -160,7 +167,8 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
         uint256 i;
         for (i = 0; i < contracts.length; i++) {
-            $._allow_sgt_value[contracts[i]] = true;
+            $._allowSgtValue[contracts[i]] = true;
+            emit AllowSgtValue(contracts[i]);
         }
     }
 
@@ -170,7 +178,8 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
         uint256 i;
         for (i = 0; i < contracts.length; i++) {
-            $._allow_sgt_value[contracts[i]] = false;
+            $._allowSgtValue[contracts[i]] = false;
+            emit DisallowSgtValue(contracts[i]);
         }
     }
 
