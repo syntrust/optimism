@@ -183,6 +183,26 @@ contract SoulGasToken is ERC20Upgradeable, OwnableUpgradeable {
         }
     }
 
+    /// @notice chargeFromOrigin is called when IS_BACKED_BY_NATIVE to charge for native balance
+    ///         from tx.origin if caller is whitelisted.
+    function chargeFromOrigin(uint256 amount) returns (uint256 amountCharged) {
+        require(IS_BACKED_BY_NATIVE, "chargeFromOrigin should only be called when IS_BACKED_BY_NATIVE");
+        SoulGasTokenStorage storage $ = _getSoulGasTokenStorage();
+        require($._allowSgtValue[_msgSender()], "caller is not whitelisted");
+        uint256 balance = balanceOf(tx.origin);
+        if (balance == 0) {
+            amountCharged = 0;
+            return;
+        }
+        if (balance >= amount) {
+            amountCharged = amount;
+        } else {
+            amountCharged = balance;
+        }
+        _burn(tx.origin, amountCharged);
+        payable(_msgSender()).transfer(amountCharged);
+    }
+
     /// @notice burnFrom is called when !IS_BACKED_BY_NATIVE:
     ///                             1. by the burner to burn SoulGasToken.
     ///                             2. by DEPOSITOR_ACCOUNT to burn SoulGasToken.
