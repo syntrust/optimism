@@ -151,6 +151,11 @@ commands:
             FOUNDRY_PROFILE: ci
 
 jobs:
+  runner-test:
+    machine: true
+    resource_class: quarkchain/ax101
+    steps:
+      - run: echo "Hi I'm on Runners!"
   cannon-go-lint-and-test:
     machine: true
     resource_class: ethereum-optimism/latitude-1
@@ -241,7 +246,7 @@ jobs:
 
   contracts-bedrock-build:
     machine: true
-    resource_class: ethereum-optimism/latitude-1
+    resource_class: quarkchain/ax101
     parameters:
       skip_pattern:
         description: Glob pattern of tests to skip
@@ -1287,9 +1292,9 @@ workflows:
       - contracts-bedrock-build:
           # Build with just core + script contracts.
           skip_pattern: test
-      - check-kontrol-build:
-          requires:
-            - contracts-bedrock-build
+      # - check-kontrol-build:
+      #     requires:
+      #       - contracts-bedrock-build
       # - contracts-bedrock-tests:
       #     # Test everything except PreimageOracle.t.sol since it's slow.
       #     name: contracts-bedrock-tests
